@@ -5,6 +5,7 @@ This implemenation uses the full buffer capacity, with a simple data structure o
 
 ## Usage
 In one C file, declare a global RingBuffer gRingBuf:
-'RingBuffer gRingBuf;'
+```c
+RingBuffer gRingBuf;
+```
 To change the default buffer size from 16 bytes, define RINGBUFSIZE to a power of two.  The maximum size is 128 bytes.
-
