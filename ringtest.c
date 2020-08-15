@@ -3,8 +3,7 @@
 
 #include "ringbuffer.h"
 
-RingBuf gRingBuf;
-
+// use a volatile so the compiler doesn't optimize it away
 volatile uint8_t testcount;
 
 int main()

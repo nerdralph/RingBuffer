@@ -15,37 +15,37 @@
 typedef struct {
     uint8_t head;
     uint8_t tail;
-    uint8_t buf[RINGBUFSIZE];
 } RingBuf;
 
-extern RingBuf gRingBuf;
+extern RingBuf gRing;
+extern uint8_t gRingBuf[RINGBUFSIZE];
 
 inline void RingInit()
 {
     //gRingBuf.tail = 0;                // crt zeros globals
-    gRingBuf.head = RINGBUFSIZE;
+    gRing.head = RINGBUFSIZE;
 }
 
 inline uint8_t RingCount()
 {
     // to understand the math behind RingCount
     // https://www.approxion.com/circular-adventures-viii-the-eternal-quest-for-mod-like-behavior/ 
-    return (gRingBuf.head - gRingBuf.tail + RINGBUFSIZE) & (RINGBUFSIZE * 2 - 1);
+    return (gRing.head - gRing.tail + RINGBUFSIZE) & (RINGBUFSIZE * 2 - 1);
 }
 
 inline void RingPut(uint8_t val)
 {
-    if (gRingBuf.head == gRingBuf.tail)
+    if (gRing.head == gRing.tail)
         return;                         // full
-    gRingBuf.buf[gRingBuf.head & (RINGBUFSIZE -1)] = val;
-    gRingBuf.head = (gRingBuf.head + 1) & (RINGBUFSIZE * 2 - 1);
+    gRingBuf[gRing.head & (RINGBUFSIZE -1)] = val;
+    gRing.head = (gRing.head + 1) & (RINGBUFSIZE * 2 - 1);
 }
 
 // RingCount() should be checked first; no error checking here
 inline uint8_t RingGet()
 {
-    uint8_t data =  gRingBuf.buf[gRingBuf.tail & (RINGBUFSIZE - 1)];
-    gRingBuf.tail = (gRingBuf.tail + 1) & (RINGBUFSIZE * 2 - 1);
+    uint8_t data =  gRingBuf[gRing.tail & (RINGBUFSIZE - 1)];
+    gRing.tail = (gRing.tail + 1) & (RINGBUFSIZE * 2 - 1);
     return data;
 }
 
