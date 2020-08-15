@@ -1,12 +1,14 @@
 // 2020 Ralph Doncaster
 // 8051 UART ring buffer for sdcc
+// 202008 untested beta
 #include <8051.h>
 #include "ringbuffer.h"
 
-// UART RX ISR in 28 bytes - RingInit must be called from main
+// UART RX ISR in 31 bytes - RingInit must be called from main
 void Uart0_ISR(void) __interrupt (SI0_VECTOR) __naked
 {
     __asm
+    jb ti, 04$                         // ignore transmit interrupt 
     push psw
     push a
 	mov	a, _gRing                       // head
@@ -23,6 +25,7 @@ void Uart0_ISR(void) __interrupt (SI0_VECTOR) __naked
     clr ri                              // clear interrupt flag
     pop a
     pop psw
-    ret
+04$:
+    reti
     __endasm;
 }
