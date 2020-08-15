@@ -26,6 +26,7 @@ void Uart0_ISR(void) __interrupt (SI0_VECTOR) __naked
     pop a
     pop psw
 04$:
+    clr ti
     reti
     __endasm;
 }
