@@ -2,9 +2,10 @@
 // small and efficient ring buffer for embedded systems written in C99 
 // buffer size must be a power of 2 up to 128 bytes
 // head and tail index range is 2* size 
-// full condition is head == tail, then any added are dropped
+// buffer is reset if put called when full
 // empty condition is when the difference between head and tail == size
 // 2020.08.12 v0.1
+// 2020.12.19 v0.3 - dropped full check for improved speed
 
 #include <stdint.h>
 
@@ -12,40 +13,30 @@
 #define RINGBUFSIZE 16
 #endif
 
-typedef struct {
-    uint8_t head;
-    uint8_t tail;
-} RingBuf;
-
-extern RingBuf gRing;
 extern uint8_t gRingBuf[RINGBUFSIZE];
+// crt initializes globals to 0
+static uint8_t ringHead;
+static uint8_t ringTail;
+static const uint8_t RINGBUFMASK = RINGBUFSIZE - 1;
 
-inline void RingInit()
+static inline uint8_t RingCount()
 {
-    //gRingBuf.tail = 0;                // crt zeros globals
-    gRing.head = RINGBUFSIZE;
+    return (ringHead - ringTail);
 }
 
-inline uint8_t RingCount()
+static inline void RingPut(uint8_t val)
 {
-    // to understand the math behind RingCount
-    // https://www.approxion.com/circular-adventures-viii-the-eternal-quest-for-mod-like-behavior/ 
-    return (gRing.head - gRing.tail + RINGBUFSIZE) & (RINGBUFSIZE * 2 - 1);
-}
-
-inline void RingPut(uint8_t val)
-{
-    if (gRing.head == gRing.tail)
-        return;                         // full
-    gRingBuf[gRing.head & (RINGBUFSIZE -1)] = val;
-    gRing.head = (gRing.head + 1) & (RINGBUFSIZE * 2 - 1);
+    gRingBuf[ringHead] = val;
+    ringHead = (ringHead + 1) & RINGBUFMASK;
 }
 
 // RingCount() should be checked first; no error checking here
-inline uint8_t RingGet()
+static inline uint8_t RingGet()
 {
-    uint8_t data =  gRingBuf[gRing.tail & (RINGBUFSIZE - 1)];
-    gRing.tail = (gRing.tail + 1) & (RINGBUFSIZE * 2 - 1);
+    const uint8_t mask = RINGBUFSIZE - 1;
+    uint8_t data =  gRingBuf[ringTail];
+    ringTail = (ringTail + 1) & RINGBUFMASK;
+
     return data;
 }
 

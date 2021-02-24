@@ -8,16 +8,14 @@ volatile uint8_t testcount;
 
 int main()
 {
-    RingInit();
     // try putting one more than buffer size
+    // buffer should wrap and end with a count of 1
+    testcount = 0;
     uint8_t end = testcount + RINGBUFSIZE + 1;
-    for (uint8_t i = 0; i <= end; i++) RingPut(i);
-    int result = 0;
-    while (RingCount()) result += RingGet();
-    int goal = RINGBUFSIZE * (RINGBUFSIZE / 2 - 1) + (RINGBUFSIZE / 2);
-    if (result == goal)
+    for (uint8_t i = 0; i < end; i++) RingPut(i);
+
+    if (RingCount() == 1 && RingGet() == end-1)
         return 0;
     else
         return 255;
-
 }
