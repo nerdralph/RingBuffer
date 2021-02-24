@@ -6,9 +6,5 @@ This implemenation uses the full buffer capacity, with a simple data structure o
 8051UART.c contains an implementation of RingPut in a serial receive intterrupt handler using inline 8051 assembler.
 
 ## Usage
-In one C file, define gRing and gRingBuf:
-```c
-RingBuf gRing;
-uint8_t gRingBuf[RINGBUFSIZE];
-```
+Either include ringbuffer.c in one of your project's C files, or compile and link ringbuffer.c.
 A sample definition is in ringbuffer.c.  To change the default buffer size from 16 bytes, define RINGBUFSIZE to a power of two.  The maximum size is 128 bytes.
